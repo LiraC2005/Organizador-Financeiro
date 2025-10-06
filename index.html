@@ -82,6 +82,57 @@
         document.getElementById("btnAnalisarMeses").onclick = function () {
             window.location.href = "meses.html";
         };
+
+        // Salvar lançamentos do mês para o usuário
+        function salvarMesFirebase(user, mes, dados) {
+            return db.ref('financas/' + user + '/meses/' + mes).set(dados);
+        }
+
+        // Ler lançamentos do mês para o usuário
+        function getMesFirebase(user, mes, callback) {
+            db.ref('financas/' + user + '/meses/' + mes).once('value').then(snapshot => {
+                callback(snapshot.val() || []);
+            });
+        }
+
+        // Ler todos os meses do usuário
+        function getTodosMesesFirebase(user, callback) {
+            db.ref('financas/' + user + '/meses').once('value').then(snapshot => {
+                callback(snapshot.val() || {});
+            });
+        }
+
+        // Exemplo de uso ao carregar itens:
+        const user = localStorage.getItem('loggedUser');
+        const mesAtual = obterMesAtual();
+
+        getMesFirebase(user, mesAtual, function (items) {
+            // Atualize a tabela com os items
+        });
+
+        // Exemplo de salvar:
+        salvarMesFirebase(user, mesAtual, items).then(() => {
+            // Atualize a interface
+        });
+    </script>
+
+    <!-- Firebase App (core) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <script>
+        // TODO: Substitua pelos dados do seu projeto Firebase
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_AUTH_DOMAIN",
+            databaseURL: "SUA_DATABASE_URL",
+            projectId: "SEU_PROJECT_ID",
+            storageBucket: "SEU_STORAGE_BUCKET",
+            messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
     </script>
 </body>
 
