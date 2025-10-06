@@ -10,11 +10,10 @@ const incomes = document.querySelector(".incomes");
 const expenses = document.querySelector(".expenses");
 const total = document.querySelector(".total");
 
-const user = localStorage.getItem('loggedUser');
 let mesAtual = obterMesAtual();
 let items = [];
 
-btnNew.onclick = async () => {
+btnNew.onclick = () => {
     if (descItem.value === "" || amount.value === "" || type.value === "") {
         return alert("Preencha todos os campos!");
     }
@@ -25,14 +24,14 @@ btnNew.onclick = async () => {
         type: type.value,
     });
 
-    await salvarMesFirebase(user, mesAtual, items);
-    await loadItens();
+    salvarMes(mesAtual, items);
+    loadItens();
 
     descItem.value = "";
     amount.value = "";
 };
 
-btnFinalizarMes.onclick = async () => {
+btnFinalizarMes.onclick = () => {
     if (items.length === 0) {
         alert("Nenhum lançamento para finalizar.");
         return;
@@ -40,8 +39,8 @@ btnFinalizarMes.onclick = async () => {
     if (confirm("Finalizar mês? Os lançamentos serão salvos e o mês será reiniciado.")) {
         mesAtual = obterProximoMesNaoExistente(mesAtual);
         items = [];
-        await salvarMesFirebase(user, mesAtual, items);
-        await loadItens();
+        salvarMes(mesAtual, items);
+        loadItens();
         document.getElementById("tituloMes").textContent = nomeMesAtualPorString(mesAtual);
     }
 };
@@ -50,10 +49,10 @@ btnAnalisarMeses.onclick = () => {
     window.location.href = "meses.html";
 };
 
-async function deleteItem(index) {
+function deleteItem(index) {
     items.splice(index, 1);
-    await salvarMesFirebase(user, mesAtual, items);
-    await loadItens();
+    salvarMes(mesAtual, items);
+    loadItens();
 }
 
 function insertItem(item, index) {
@@ -74,9 +73,8 @@ function insertItem(item, index) {
     tbody.appendChild(tr);
 }
 
-async function loadItens() {
-    items = await getMesFirebase(user, mesAtual);
-    if (!items) items = [];
+function loadItens() {
+    items = getTodosMeses()[mesAtual] || [];
     atualizarTabela();
     getTotals();
 }
@@ -128,33 +126,29 @@ function obterProximoMes(mes) {
     return ano + "-" + String(mesNum).padStart(2, "0");
 }
 
-async function obterProximoMesNaoExistente(mesAtual) {
+function obterProximoMesNaoExistente(mesAtual) {
+    // Recebe o mês atual no formato "YYYY-MM"
     let [ano, mes] = mesAtual.split("-").map(Number);
-    let mesesSalvos = await getTodosMesesFirebase(user);
-    let proximo;
+    let mesesSalvos = getTodosMeses();
     do {
         mes++;
         if (mes > 12) {
             mes = 1;
             ano++;
         }
-        proximo = ano + "-" + String(mes).padStart(2, "0");
-    } while (mesesSalvos && mesesSalvos[proximo]);
+        var proximo = ano + "-" + String(mes).padStart(2, "0");
+    } while (mesesSalvos[proximo]);
     return proximo;
 }
 
-// --- Firebase Functions ---
-
-function salvarMesFirebase(user, mes, dados) {
-    return db.ref('financas/' + user + '/meses/' + mes).set(dados);
+function getTodosMeses() {
+    return JSON.parse(localStorage.getItem("financas_meses")) ?? {};
 }
 
-function getMesFirebase(user, mes) {
-    return db.ref('financas/' + user + '/meses/' + mes).once('value').then(snapshot => snapshot.val() || []);
-}
-
-function getTodosMesesFirebase(user) {
-    return db.ref('financas/' + user + '/meses').once('value').then(snapshot => snapshot.val() || {});
+function salvarMes(mes, dados) {
+    const todos = getTodosMeses();
+    todos[mes] = dados;
+    localStorage.setItem("financas_meses", JSON.stringify(todos));
 }
 
 // Função para mostrar o nome do mês a partir do formato "YYYY-MM"
@@ -167,5 +161,4 @@ function nomeMesAtualPorString(str) {
     return meses[parseInt(mes, 10) - 1] + " / " + ano;
 }
 
-// Inicialização
 loadItens();
