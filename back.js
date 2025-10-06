@@ -110,6 +110,24 @@ function getTotals() {
     total.innerHTML = totalItems;
 }
 
+// Obter usuário logado
+function getLoggedUser() {
+    return localStorage.getItem('loggedUser');
+}
+
+// Funções para lidar com meses, agora por usuário
+function getTodosMeses() {
+    const user = getLoggedUser();
+    return JSON.parse(localStorage.getItem("financas_meses_" + user)) ?? {};
+}
+
+function salvarMes(mes, dados) {
+    const user = getLoggedUser();
+    const meses = getTodosMeses();
+    meses[mes] = dados;
+    localStorage.setItem("financas_meses_" + user, JSON.stringify(meses));
+}
+
 // Funções para lidar com meses
 function obterMesAtual() {
     const hoje = new Date();
@@ -139,16 +157,6 @@ function obterProximoMesNaoExistente(mesAtual) {
         var proximo = ano + "-" + String(mes).padStart(2, "0");
     } while (mesesSalvos[proximo]);
     return proximo;
-}
-
-function getTodosMeses() {
-    return JSON.parse(localStorage.getItem("financas_meses")) ?? {};
-}
-
-function salvarMes(mes, dados) {
-    const todos = getTodosMeses();
-    todos[mes] = dados;
-    localStorage.setItem("financas_meses", JSON.stringify(todos));
 }
 
 // Função para mostrar o nome do mês a partir do formato "YYYY-MM"
