@@ -1,15 +1,9 @@
-function getLoggedUser() {
-    return localStorage.getItem('loggedUser');
-}
-
 function getTodosMeses() {
-    const user = getLoggedUser();
-    return JSON.parse(localStorage.getItem("financas_meses_" + user)) ?? {};
+    return JSON.parse(localStorage.getItem("financas_meses")) ?? {};
 }
 
 function salvarTodosMeses(meses) {
-    const user = getLoggedUser();
-    localStorage.setItem("financas_meses_" + user, JSON.stringify(meses));
+    localStorage.setItem("financas_meses", JSON.stringify(meses));
 }
 
 function apagarMes(mes) {
