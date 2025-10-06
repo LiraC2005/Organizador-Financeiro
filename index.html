@@ -13,6 +13,12 @@
 </head>
 
 <body>
+    <script>
+        // Redireciona para login se não houver usuário logado
+        if (!localStorage.getItem('loggedUser')) {
+            window.location.href = "login.html";
+        }
+    </script>
     <main>
         <h1 id="tituloMes" style="margin-bottom: 18px; color: #2C73D2; text-align: center;"></h1>
         <div class="resume">

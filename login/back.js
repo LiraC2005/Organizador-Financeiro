@@ -51,6 +51,7 @@ document.getElementById('loginForm').onsubmit = function (e) {
     if (users[user] && users[user] === pass) {
         msg.style.color = 'green';
         msg.textContent = 'Login realizado com sucesso!';
+        localStorage.setItem('loggedUser', user); // Salva usuário logado
         setTimeout(function () {
             window.location.href = '../index.html';
         }, 1000); // Aguarda 1 segundo antes de redirecionar
