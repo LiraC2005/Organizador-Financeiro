@@ -3,33 +3,43 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="favicon.png">
     <title>FINANÇAS</title>
+
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 
 <body>
     <main>
-        <div style="width: 100%; display: flex; justify-content: flex-end;">
-            <button id="btnLogout"
-                style="background: #D83121; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Sair</button>
-        </div>
         <h1 id="tituloMes" style="margin-bottom: 18px; color: #2C73D2; text-align: center;"></h1>
         <div class="resume">
-            <div>Entradas: R$ <span class="incomes">0.00</span></div>
-            <div>Saídas: R$ <span class="expenses">0.00</span></div>
-            <div>Total: R$ <span class="total">0.00</span></div>
+            <div>
+                Entradas: R$
+                <span class="incomes">0.00</span>
+            </div>
+            <div>
+                Saídas: R$
+                <span class="expenses">0.00</span>
+            </div>
+            <div>
+                Total: R$
+                <span class="total">0.00</span>
+            </div>
         </div>
         <div class="newItem">
-            <div class="divDesc"><label>Descrição</label><input type="text" id="desc" /></div>
-            <div class="divAmount"><label>Valor</label><input type="number" id="amount" /></div>
+            <div class="divDesc">
+                <label for="desc">Descrição</label>
+                <input type="text" id="desc" />
+            </div>
+            <div class="divAmount">
+                <label for="amount">Valor</label>
+                <input type="number" id="amount" />
+            </div>
             <div class="divType">
-                <label>Tipo</label>
+                <label for="type">Tipo</label>
                 <select id="type">
                     <option>Entrada</option>
                     <option>Saída</option>
@@ -42,28 +52,37 @@
                 <thead>
                     <tr>
                         <th>Descrição</th>
-                        <th>Valor</th>
-                        <th>Tipo</th>
-                        <th></th>
+                        <th class="columnAmount">Valor</th>
+                        <th class="columnType">Tipo</th>
+                        <th class="columnAction"></th>
                     </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody>
+                </tbody>
             </table>
         </div>
         <div class="acoes-finais">
+            <button id="btnFinalizarMes" style="background:#218c5b; color:#fff;">Finalizar Mês</button>
             <button id="btnAnalisarMeses" style="background:#218c5b; color:#fff;">Analisar Meses</button>
         </div>
     </main>
 
-    <script>
-        const firebaseConfig = { /* COLE SUAS CREDENCIAIS AQUI */ };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-        document.getElementById("btnLogout").onclick = () => auth.signOut().then(() => window.location.href = "login.html");
-        document.getElementById("btnAnalisarMeses").onclick = () => window.location.href = "meses.html";
-    </script>
     <script src="back.js"></script>
+    <script>
+        function nomeMesAtual() {
+            const meses = [
+                "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+                "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+            ];
+            const hoje = new Date();
+            return meses[hoje.getMonth()] + " / " + hoje.getFullYear();
+        }
+        document.getElementById("tituloMes").textContent = nomeMesAtual();
+
+        document.getElementById("btnAnalisarMeses").onclick = function () {
+            window.location.href = "meses.html";
+        };
+    </script>
 </body>
 
 </html>

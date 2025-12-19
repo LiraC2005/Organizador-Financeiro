@@ -1,42 +1,61 @@
-auth.onAuthStateChanged((user) => {
-    if (user) { mostrarMeses(); }
-    else { window.location.href = "../login.html"; }
-});
+function getTodosMeses() {
+    return JSON.parse(localStorage.getItem("financas_meses")) ?? {};
+}
 
-async function mostrarMeses() {
+function salvarTodosMeses(meses) {
+    localStorage.setItem("financas_meses", JSON.stringify(meses));
+}
+
+function apagarMes(mes) {
+    if (confirm(`Deseja apagar o mês ${mes}? Esta ação não pode ser desfeita.`)) {
+        const meses = getTodosMeses();
+        delete meses[mes];
+        salvarTodosMeses(meses);
+        mostrarMeses();
+    }
+}
+
+function mostrarMeses() {
     const container = document.getElementById("listaMeses");
-    const user = auth.currentUser;
-    const snapshot = await db.collection("transacoes").where("userId", "==", user.uid).get();
-
+    const meses = getTodosMeses();
     container.innerHTML = "";
-    const agrupado = {};
 
-    snapshot.forEach(doc => {
-        const d = doc.data();
-        if (!agrupado[d.mesReferencia]) agrupado[d.mesReferencia] = [];
-        agrupado[d.mesReferencia].push({ id: doc.id, ...d });
-    });
+    if (Object.keys(meses).length === 0) {
+        container.innerHTML = "<p>Nenhum mês salvo.</p>";
+        return;
+    }
 
-    Object.keys(agrupado).sort().reverse().forEach(mes => {
-        const div = document.createElement("div");
-        div.className = "mes-bloco";
-        div.innerHTML = `
-            <h3>${mes} <button onclick="apagarMes('${mes}')" style="background:red; color:white; border:none; padding:4px; border-radius:4px; cursor:pointer;">Apagar Mês</button></h3>
+    Object.entries(meses).forEach(([mes, lancamentos]) => {
+        const divMes = document.createElement("div");
+        divMes.className = "mes-bloco";
+        divMes.innerHTML = `
+            <h3>${mes} 
+                <button class="apagar-mes" onclick="apagarMes('${mes}')">Apagar</button>
+            </h3>
             <table>
-                ${agrupado[mes].map(i => `<tr><td>${i.desc}</td><td>R$ ${i.amount}</td><td>${i.type}</td></tr>`).join("")}
-            </table>`;
-        container.appendChild(div);
+                <thead>
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                        <th>Tipo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${lancamentos.map(item => `
+                        <tr>
+                            <td>${item.desc}</td>
+                            <td>R$ ${item.amount}</td>
+                            <td>${item.type}</td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            </table>
+        `;
+        container.appendChild(divMes);
     });
 }
 
-async function apagarMes(mes) {
-    if (!confirm("Apagar todos os dados deste mês?")) return;
-    const snapshot = await db.collection("transacoes")
-        .where("userId", "==", auth.currentUser.uid)
-        .where("mesReferencia", "==", mes).get();
+// Torna a função global para o onclick funcionar
+window.apagarMes = apagarMes;
 
-    const batch = db.batch();
-    snapshot.forEach(doc => batch.delete(doc.ref));
-    await batch.commit();
-    mostrarMeses();
-}
+mostrarMeses();
