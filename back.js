@@ -1,3 +1,14 @@
+async function verificarLogin() {
+    const { data } = await supabase.auth.getUser();
+
+    if (!data.user) {
+        window.location.href = "login.html";
+    }
+}
+
+verificarLogin();
+
+
 let items = [];
 let mesAtual = obterMesAtual();
 

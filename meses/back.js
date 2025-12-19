@@ -1,3 +1,11 @@
+async function verificarLogin() {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) window.location.href = "../login.html";
+}
+
+verificarLogin();
+
+
 async function carregarMeses() {
     const { data } = await supabase
         .from("financas")
