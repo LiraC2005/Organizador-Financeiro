@@ -59,9 +59,7 @@ function render() {
       </tr>
     `;
 
-        i.tipo === "Entrada"
-            ? entradas += i.valor
-            : saidas += i.valor;
+        i.tipo === "Entrada" ? entradas += i.valor : saidas += i.valor;
     });
 
     document.querySelector(".incomes").innerText = entradas.toFixed(2);
