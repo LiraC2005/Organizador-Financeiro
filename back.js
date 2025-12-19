@@ -2,7 +2,7 @@ async function verificarLogin() {
     const { data } = await supabase.auth.getUser();
 
     if (!data.user) {
-        window.location.href = "login.html";
+        window.location.href = "/login.html";
     }
 }
 
