@@ -237,7 +237,7 @@ i {
 .arrow {
     font-weight: bold;
     border-radius: 20px;
-    padding: 2px 8px;
+    padding: 0 8px;
 }
 
 .arrow.up {
