@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>Login - Planner Financeiro</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,17 +16,57 @@
         }
 
         .box {
-            background: white;
-            padding: 20px;
+            background: #fff;
+            padding: 25px;
             border-radius: 8px;
-            width: 300px;
+            width: 320px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
-        input,
+        h2 {
+            margin-bottom: 15px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
         button {
             width: 100%;
-            margin-top: 10px;
-            padding: 8px;
+            padding: 10px;
+            margin-top: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button.login {
+            background: #2196f3;
+            color: #fff;
+        }
+
+        button.cadastro {
+            background: #4caf50;
+            color: #fff;
+        }
+
+        #msg {
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        .erro {
+            color: #f44336;
+        }
+
+        .sucesso {
+            color: #4caf50;
         }
     </style>
 </head>
@@ -33,29 +74,35 @@
 <body>
 
     <div class="box">
-        <h2>Login</h2>
+        <h2>Planner Financeiro</h2>
 
         <input id="email" type="email" placeholder="Email">
         <input id="senha" type="password" placeholder="Senha">
 
-        <button onclick="login()">Entrar</button>
-        <button onclick="cadastrar()">Cadastrar</button>
+        <button class="login" onclick="login()">Entrar</button>
+        <button class="cadastro" onclick="cadastrar()">Cadastrar</button>
+
+        <p id="msg"></p>
     </div>
 
     <script type="module">
         import { supabase } from "./supabase.js";
 
-        window.login = async () => {
-            const emailInput = document.getElementById("email");
-            const senhaInput = document.getElementById("senha");
+        const msg = document.getElementById("msg");
 
-            if (!emailInput || !senhaInput) {
-                alert("Campos não encontrados no HTML");
+        function mostrarMensagem(texto, tipo) {
+            msg.textContent = texto;
+            msg.className = tipo;
+        }
+
+        window.login = async () => {
+            const email = document.getElementById("email").value.trim();
+            const senha = document.getElementById("senha").value.trim();
+
+            if (!email || !senha) {
+                mostrarMensagem("Preencha email e senha.", "erro");
                 return;
             }
-
-            const email = emailInput.value;
-            const senha = senhaInput.value;
 
             const { error } = await supabase.auth.signInWithPassword({
                 email,
@@ -63,15 +110,27 @@
             });
 
             if (error) {
-                alert(error.message);
+                if (error.message.includes("Invalid login credentials")) {
+                    mostrarMensagem("Email ou senha incorretos.", "erro");
+                } else {
+                    mostrarMensagem("Erro ao fazer login. Tente novamente.", "erro");
+                }
             } else {
-                window.location.href = "index.html";
+                mostrarMensagem("Login realizado com sucesso!", "sucesso");
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 800);
             }
         };
 
         window.cadastrar = async () => {
-            const email = document.getElementById("email").value;
-            const senha = document.getElementById("senha").value;
+            const email = document.getElementById("email").value.trim();
+            const senha = document.getElementById("senha").value.trim();
+
+            if (!email || !senha) {
+                mostrarMensagem("Preencha email e senha.", "erro");
+                return;
+            }
 
             const { error } = await supabase.auth.signUp({
                 email,
@@ -79,17 +138,16 @@
             });
 
             if (error) {
-                if (error.message.includes("Invalid login credentials")) {
-                    alert("Email ou senha incorretos.");
-                } else if (error.message.includes("Password should be at least")) {
-                    alert("A senha deve ter no mínimo 6 caracteres.");
-                } else if (error.message.includes("User already registered")) {
-                    alert("Este email já está cadastrado.");
+                if (error.message.includes("already registered")) {
+                    mostrarMensagem("Este email já está cadastrado.", "erro");
+                } else if (error.message.includes("at least")) {
+                    mostrarMensagem("A senha deve ter no mínimo 6 caracteres.", "erro");
                 } else {
-                    alert("Erro ao fazer login. Tente novamente.");
+                    mostrarMensagem("Erro ao cadastrar usuário.", "erro");
                 }
+            } else {
+                mostrarMensagem("Cadastro realizado! Faça login.", "sucesso");
             }
-
         };
     </script>
 
