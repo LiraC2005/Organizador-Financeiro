@@ -79,10 +79,17 @@
             });
 
             if (error) {
-                alert(error.message);
-            } else {
-                alert("Cadastro realizado! Faça login.");
+                if (error.message.includes("Invalid login credentials")) {
+                    alert("Email ou senha incorretos.");
+                } else if (error.message.includes("Password should be at least")) {
+                    alert("A senha deve ter no mínimo 6 caracteres.");
+                } else if (error.message.includes("User already registered")) {
+                    alert("Este email já está cadastrado.");
+                } else {
+                    alert("Erro ao fazer login. Tente novamente.");
+                }
             }
+
         };
     </script>
 

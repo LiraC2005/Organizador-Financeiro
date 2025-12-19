@@ -236,15 +236,18 @@ i {
 
 .arrow {
     font-weight: bold;
-    border-radius: 100%;
+    border-radius: 20px;
+    padding: 2px 8px;
 }
 
 .arrow.up {
     background-color: #2196f3;
+    color: #fff;
     /* azul */
 }
 
 .arrow.down {
     background-color: #f44336;
+    color: #fff;
     /* vermelho */
 }
