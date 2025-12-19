@@ -236,14 +236,15 @@ i {
 
 .arrow {
     font-weight: bold;
+    border-radius: 100%;
 }
 
 .arrow.up {
-    color: #2196f3;
+    background-color: #2196f3;
     /* azul */
 }
 
 .arrow.down {
-    color: #f44336;
+    background-color: #f44336;
     /* vermelho */
 }
