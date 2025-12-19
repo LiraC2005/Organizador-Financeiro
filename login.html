@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Login - Finanças</title>
+    <title>Login - Organizador Financeiro</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -11,18 +11,17 @@
 
 <body>
     <main>
-        <h2 style="color: #2C73D2; margin-bottom: 20px;">Entrar no Planejamento</h2>
+        <h2 style="color: #2C73D2; margin-bottom: 20px;">Entrar no Sistema</h2>
         <div class="newItem" style="flex-direction: column; width: 100%; max-width: 300px;">
             <label>E-mail</label>
-            <input type="email" id="email" style="width: 100%;">
+            <input type="email" id="email">
             <label>Senha</label>
-            <input type="password" id="password" style="width: 100%;">
+            <input type="password" id="password">
             <button id="btnLogin" style="width: 100%; margin-top: 15px;">Entrar</button>
-            <button id="btnCadastrar" style="width: 100%; background: #555; margin-top: 5px;">Criar Conta</button>
+            <button id="btnCadastrar" style="width: 100%; background: #555; margin-top: 10px;">Criar Conta</button>
         </div>
     </main>
     <script>
-        // COLE AS MESMAS CREDENCIAIS AQUI
         const firebaseConfig = {
             apiKey: "AIzaSyAFTw75ke3BMBn5GYb7x0Y6PO4XdybKJLY",
             authDomain: "planejamento-financeiro-c335e.firebaseapp.com",
@@ -38,13 +37,13 @@
         document.getElementById("btnLogin").onclick = () => {
             auth.signInWithEmailAndPassword(email.value, password.value)
                 .then(() => window.location.href = "index.html")
-                .catch(e => alert("Erro: " + e.message));
+                .catch(e => alert("Erro ao entrar: " + e.message));
         };
 
         document.getElementById("btnCadastrar").onclick = () => {
             auth.createUserWithEmailAndPassword(email.value, password.value)
                 .then(() => alert("Conta criada! Agora clique em Entrar."))
-                .catch(e => alert("Erro: " + e.message));
+                .catch(e => alert("Erro ao cadastrar: " + e.message));
         };
     </script>
 </body>

@@ -5,10 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="favicon.png">
-    <title>FINANÇAS - Home</title>
+    <title>FINANÇAS</title>
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="style.css">
-
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -21,24 +20,16 @@
                 style="background: #D83121; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Sair</button>
         </div>
         <h1 id="tituloMes" style="margin-bottom: 18px; color: #2C73D2; text-align: center;"></h1>
-
         <div class="resume">
             <div>Entradas: R$ <span class="incomes">0.00</span></div>
             <div>Saídas: R$ <span class="expenses">0.00</span></div>
             <div>Total: R$ <span class="total">0.00</span></div>
         </div>
-
         <div class="newItem">
-            <div class="divDesc">
-                <label for="desc">Descrição</label>
-                <input type="text" id="desc" />
-            </div>
-            <div class="divAmount">
-                <label for="amount">Valor</label>
-                <input type="number" id="amount" />
-            </div>
+            <div class="divDesc"><label>Descrição</label><input type="text" id="desc" /></div>
+            <div class="divAmount"><label>Valor</label><input type="number" id="amount" /></div>
             <div class="divType">
-                <label for="type">Tipo</label>
+                <label>Tipo</label>
                 <select id="type">
                     <option>Entrada</option>
                     <option>Saída</option>
@@ -46,43 +37,31 @@
             </div>
             <button id="btnNew">Incluir</button>
         </div>
-
         <div class="divTable">
             <table>
                 <thead>
                     <tr>
                         <th>Descrição</th>
-                        <th class="columnAmount">Valor</th>
-                        <th class="columnType">Tipo</th>
-                        <th class="columnAction"></th>
+                        <th>Valor</th>
+                        <th>Tipo</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
-
         <div class="acoes-finais">
-            <button id="btnFinalizarMes">Finalizar Mês</button>
-            <button id="btnAnalisarMeses">Analisar Meses</button>
+            <button id="btnAnalisarMeses" style="background:#218c5b; color:#fff;">Analisar Meses</button>
         </div>
     </main>
 
     <script>
-        // COLE AQUI SUAS CREDENCIAIS DO FIREBASE
-        const firebaseConfig = {
-            apiKey: "SUA_API_KEY",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            projectId: "SEU_PROJETO",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "SEU_ID",
-            appId: "SEU_APP_ID"
-        };
+        const firebaseConfig = { /* COLE SUAS CREDENCIAIS AQUI */ };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-
-        // Botão Sair
-        document.getElementById("btnLogout").onclick = () => auth.signOut();
+        document.getElementById("btnLogout").onclick = () => auth.signOut().then(() => window.location.href = "login.html");
+        document.getElementById("btnAnalisarMeses").onclick = () => window.location.href = "meses.html";
     </script>
     <script src="back.js"></script>
 </body>

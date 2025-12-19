@@ -3,7 +3,6 @@ const descItem = document.querySelector("#desc");
 const amount = document.querySelector("#amount");
 const type = document.querySelector("#type");
 const btnNew = document.querySelector("#btnNew");
-
 const incomes = document.querySelector(".incomes");
 const expenses = document.querySelector(".expenses");
 const total = document.querySelector(".total");
@@ -11,7 +10,7 @@ const total = document.querySelector(".total");
 let items = [];
 let mesAtual = obterMesAtual();
 
-// 1. Monitor de Autenticação
+// Monitor de Login
 auth.onAuthStateChanged((user) => {
     if (user) {
         document.getElementById("tituloMes").textContent = nomeMesAtualPorString(mesAtual);
@@ -21,15 +20,11 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
-// 2. Salvar no Firebase
 btnNew.onclick = async () => {
-    if (descItem.value === "" || amount.value === "" || type.value === "") {
-        return alert("Preencha todos os campos!");
-    }
+    if (descItem.value === "" || amount.value === "" || type.value === "") return alert("Preencha tudo!");
 
-    const user = auth.currentUser;
     await db.collection("transacoes").add({
-        userId: user.uid,
+        userId: auth.currentUser.uid,
         desc: descItem.value,
         amount: Math.abs(amount.value).toFixed(2),
         type: type.value,
@@ -37,67 +32,50 @@ btnNew.onclick = async () => {
         dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    descItem.value = "";
-    amount.value = "";
+    descItem.value = ""; amount.value = "";
     loadItens();
 };
 
-// 3. Carregar do Firebase (Apenas do usuário logado)
 async function loadItens() {
     const user = auth.currentUser;
-    if (!user) return;
-
     const snapshot = await db.collection("transacoes")
         .where("userId", "==", user.uid)
         .where("mesReferencia", "==", mesAtual)
         .get();
 
     items = [];
-    snapshot.forEach(doc => {
-        items.push({ id: doc.id, ...doc.data() });
-    });
-
-    atualizarTabela();
-    getTotals();
+    snapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+    render();
 }
 
-function atualizarTabela() {
+function render() {
     tbody.innerHTML = "";
     items.forEach((item) => {
         let tr = document.createElement("tr");
         tr.innerHTML = `
             <td>${item.desc}</td>
             <td>R$ ${item.amount}</td>
-            <td class="columnType">${item.type === "Entrada"
-                ? '<i class="bx bxs-chevron-up-circle"></i>'
-                : '<i class="bx bxs-chevron-down-circle"></i>'}</td>
-            <td class="columnAction">
-                <button onclick="deleteItem('${item.id}')"><i class='bx bx-trash'></i></button>
-            </td>
+            <td>${item.type === "Entrada" ? '<i class="bx bxs-chevron-up-circle"></i>' : '<i class="bx bxs-chevron-down-circle"></i>'}</td>
+            <td class="columnAction"><button onclick="deleteItem('${item.id}')"><i class='bx bx-trash'></i></button></td>
         `;
         tbody.appendChild(tr);
     });
+    updateTotals();
 }
 
 async function deleteItem(id) {
-    if (confirm("Excluir lançamento?")) {
+    if (confirm("Excluir?")) {
         await db.collection("transacoes").doc(id).delete();
         loadItens();
     }
 }
 
-function getTotals() {
-    const totalIncomes = items
-        .filter(i => i.type === "Entrada")
-        .reduce((acc, cur) => acc + Number(cur.amount), 0).toFixed(2);
-
-    const totalExpenses = items
-        .filter(i => i.type === "Saída")
-        .reduce((acc, cur) => acc + Number(cur.amount), 0).toFixed(2);
-
-    incomes.innerHTML = totalIncomes;
-    expenses.innerHTML = totalExpenses;
-    total.innerHTML = (totalIncomes - totalExpenses).toFixed(2);
+function updateTotals() {
+    const inc = items.filter(i => i.type === "Entrada").reduce((a, c) => a + Number(c.amount), 0);
+    const exp = items.filter(i => i.type === "Saída").reduce((a, c) => a + Number(c.amount), 0);
+    incomes.innerHTML = inc.toFixed(2);
+    expenses.innerHTML = exp.toFixed(2);
+    total.innerHTML = (inc - exp).toFixed(2);
 }
 
 function obterMesAtual() {
