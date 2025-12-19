@@ -1,164 +1,80 @@
-const tbody = document.querySelector("tbody");
-const descItem = document.querySelector("#desc");
-const amount = document.querySelector("#amount");
-const type = document.querySelector("#type");
-const btnNew = document.querySelector("#btnNew");
-const btnFinalizarMes = document.querySelector("#btnFinalizarMes");
-const btnAnalisarMeses = document.querySelector("#btnAnalisarMeses");
-
-const incomes = document.querySelector(".incomes");
-const expenses = document.querySelector(".expenses");
-const total = document.querySelector(".total");
-
-let mesAtual = obterMesAtual();
 let items = [];
+let mesAtual = obterMesAtual();
 
-btnNew.onclick = () => {
-    if (descItem.value === "" || amount.value === "" || type.value === "") {
-        return alert("Preencha todos os campos!");
-    }
+async function verificarLogin() {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) window.location.href = "login.html";
+}
+verificarLogin();
 
-    items.push({
-        desc: descItem.value,
-        amount: Math.abs(amount.value).toFixed(2),
-        type: type.value,
+document.getElementById("tituloMes").innerText = mesAtual;
+
+document.getElementById("btnNew").onclick = async () => {
+    const desc = document.getElementById("desc").value;
+    const amount = document.getElementById("amount").value;
+    const type = document.getElementById("type").value;
+
+    if (!desc || !amount) return alert("Preencha todos os campos");
+
+    const user = (await supabase.auth.getUser()).data.user;
+
+    await supabase.from("financas").insert({
+        user_id: user.id,
+        mes: mesAtual,
+        descricao: desc,
+        valor: Math.abs(amount),
+        tipo: type
     });
 
-    salvarMes(mesAtual, items);
-    loadItens();
+    document.getElementById("desc").value = "";
+    document.getElementById("amount").value = "";
 
-    descItem.value = "";
-    amount.value = "";
+    carregarMes();
 };
 
-btnFinalizarMes.onclick = () => {
-    if (items.length === 0) {
-        alert("Nenhum lançamento para finalizar.");
-        return;
-    }
-    if (confirm("Finalizar mês? Os lançamentos serão salvos e o mês será reiniciado.")) {
-        mesAtual = obterProximoMesNaoExistente(mesAtual);
-        items = [];
-        salvarMes(mesAtual, items);
-        loadItens();
-        document.getElementById("tituloMes").textContent = nomeMesAtualPorString(mesAtual);
-    }
-};
+async function carregarMes() {
+    const { data } = await supabase
+        .from("financas")
+        .select("*")
+        .eq("mes", mesAtual);
 
-btnAnalisarMeses.onclick = () => {
-    window.location.href = "meses.html";
-};
-
-function deleteItem(index) {
-    items.splice(index, 1);
-    salvarMes(mesAtual, items);
-    loadItens();
+    items = data || [];
+    render();
 }
+carregarMes();
 
-function insertItem(item, index) {
-    let tr = document.createElement("tr");
-
-    tr.innerHTML = `
-    <td>${item.desc}</td>
-    <td>R$ ${item.amount}</td>
-    <td class="columnType">${item.type === "Entrada"
-            ? '<i class="bx bxs-chevron-up-circle"></i>'
-            : '<i class="bx bxs-chevron-down-circle"></i>'
-        }</td>
-    <td class="columnAction">
-      <button onclick="deleteItem(${index})"><i class='bx bx-trash'></i></button>
-    </td>
-  `;
-
-    tbody.appendChild(tr);
-}
-
-function loadItens() {
-    items = getTodosMeses()[mesAtual] || [];
-    atualizarTabela();
-    getTotals();
-}
-
-function atualizarTabela() {
+function render() {
+    const tbody = document.querySelector("tbody");
     tbody.innerHTML = "";
-    items.forEach((item, index) => {
-        insertItem(item, index);
+
+    let entradas = 0;
+    let saidas = 0;
+
+    items.forEach(i => {
+        tbody.innerHTML += `
+      <tr>
+        <td>${i.descricao}</td>
+        <td>R$ ${i.valor}</td>
+        <td>${i.tipo}</td>
+      </tr>
+    `;
+
+        i.tipo === "Entrada"
+            ? entradas += i.valor
+            : saidas += i.valor;
     });
+
+    document.querySelector(".incomes").innerText = entradas.toFixed(2);
+    document.querySelector(".expenses").innerText = saidas.toFixed(2);
+    document.querySelector(".total").innerText = (entradas - saidas).toFixed(2);
 }
 
-function getTotals() {
-    const amountIncomes = items
-        .filter((item) => item.type === "Entrada")
-        .map((transaction) => Number(transaction.amount));
-
-    const amountExpenses = items
-        .filter((item) => item.type === "Saída")
-        .map((transaction) => Number(transaction.amount));
-
-    const totalIncomes = amountIncomes
-        .reduce((acc, cur) => acc + cur, 0)
-        .toFixed(2);
-
-    const totalExpenses = Math.abs(
-        amountExpenses.reduce((acc, cur) => acc + cur, 0)
-    ).toFixed(2);
-
-    const totalItems = (totalIncomes - totalExpenses).toFixed(2);
-
-    incomes.innerHTML = totalIncomes;
-    expenses.innerHTML = totalExpenses;
-    total.innerHTML = totalItems;
-}
-
-// Funções para lidar com meses
 function obterMesAtual() {
-    const hoje = new Date();
-    return hoje.getFullYear() + "-" + String(hoje.getMonth() + 1).padStart(2, "0");
+    const d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
 }
 
-function obterProximoMes(mes) {
-    let [ano, mesNum] = mes.split("-").map(Number);
-    mesNum++;
-    if (mesNum > 12) {
-        mesNum = 1;
-        ano++;
-    }
-    return ano + "-" + String(mesNum).padStart(2, "0");
+async function logout() {
+    await supabase.auth.signOut();
+    window.location.href = "login.html";
 }
-
-function obterProximoMesNaoExistente(mesAtual) {
-    // Recebe o mês atual no formato "YYYY-MM"
-    let [ano, mes] = mesAtual.split("-").map(Number);
-    let mesesSalvos = getTodosMeses();
-    do {
-        mes++;
-        if (mes > 12) {
-            mes = 1;
-            ano++;
-        }
-        var proximo = ano + "-" + String(mes).padStart(2, "0");
-    } while (mesesSalvos[proximo]);
-    return proximo;
-}
-
-function getTodosMeses() {
-    return JSON.parse(localStorage.getItem("financas_meses")) ?? {};
-}
-
-function salvarMes(mes, dados) {
-    const todos = getTodosMeses();
-    todos[mes] = dados;
-    localStorage.setItem("financas_meses", JSON.stringify(todos));
-}
-
-// Função para mostrar o nome do mês a partir do formato "YYYY-MM"
-function nomeMesAtualPorString(str) {
-    const meses = [
-        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
-    ];
-    const [ano, mes] = str.split("-");
-    return meses[parseInt(mes, 10) - 1] + " / " + ano;
-}
-
-loadItens();
