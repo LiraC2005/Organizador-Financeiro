@@ -48,6 +48,7 @@ async function carregarMes() {
 
 await carregarMes();
 
+
 function render() {
     const tbody = document.querySelector("tbody");
     tbody.innerHTML = "";
@@ -56,21 +57,30 @@ function render() {
     let saidas = 0;
 
     items.forEach(i => {
+        const tipoIcone =
+            i.tipo === "Entrada"
+                ? '<span class="arrow up">⬆</span>'
+                : '<span class="arrow down">⬇</span>';
+
         tbody.innerHTML += `
       <tr>
         <td>${i.descricao}</td>
-        <td>R$ ${i.valor}</td>
-        <td>${i.tipo}</td>
+        <td>R$ ${Number(i.valor).toFixed(2)}</td>
+        <td class="columnType">${tipoIcone}</td>
       </tr>
     `;
 
-        i.tipo === "Entrada" ? entradas += i.valor : saidas += i.valor;
+        i.tipo === "Entrada"
+            ? (entradas += i.valor)
+            : (saidas += i.valor);
     });
 
     document.querySelector(".incomes").innerText = entradas.toFixed(2);
     document.querySelector(".expenses").innerText = saidas.toFixed(2);
     document.querySelector(".total").innerText = (entradas - saidas).toFixed(2);
 }
+
+
 
 function obterMesAtual() {
     const d = new Date();

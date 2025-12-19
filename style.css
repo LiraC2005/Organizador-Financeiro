@@ -228,3 +228,22 @@ i {
 #btnAnalisarMeses:hover {
     background: #333;
 }
+
+.columnType {
+    text-align: center;
+    font-size: 20px;
+}
+
+.arrow {
+    font-weight: bold;
+}
+
+.arrow.up {
+    color: #2196f3;
+    /* azul */
+}
+
+.arrow.down {
+    color: #f44336;
+    /* vermelho */
+}
