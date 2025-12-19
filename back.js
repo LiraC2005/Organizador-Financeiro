@@ -1,22 +1,14 @@
-async function verificarLogin() {
-    const { data } = await supabase.auth.getUser();
+import { supabase } from "./supabase.js";
 
-    if (!data.user) {
-        window.location.href = "/login.html";
-    }
+// 🔐 proteção
+const { data } = await supabase.auth.getUser();
+if (!data.user) {
+    window.location.href = "login.html";
 }
 
-verificarLogin();
-
-
+// resto do código
 let items = [];
 let mesAtual = obterMesAtual();
-
-async function verificarLogin() {
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) window.location.href = "login.html";
-}
-verificarLogin();
 
 document.getElementById("tituloMes").innerText = mesAtual;
 
@@ -52,7 +44,8 @@ async function carregarMes() {
     items = data || [];
     render();
 }
-carregarMes();
+
+await carregarMes();
 
 function render() {
     const tbody = document.querySelector("tbody");
@@ -83,7 +76,7 @@ function obterMesAtual() {
     return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
 }
 
-async function logout() {
+window.logout = async () => {
     await supabase.auth.signOut();
     window.location.href = "login.html";
-}
+};

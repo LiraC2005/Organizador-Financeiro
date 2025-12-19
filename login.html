@@ -1,50 +1,29 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<script type="module">
+    import { supabase } from "./supabase.js";
 
-<head>
-    <meta charset="UTF-8">
-    <title>Login - Planner</title>
-</head>
+    window.login = async () => {
+        const email = document.getElementById("email").value;
+        const senha = document.getElementById("senha").value;
 
-<body>
+        const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password: senha
+        });
 
-    <h2>Planner Financeiro</h2>
+        if (error) alert(error.message);
+        else window.location.href = "index.html";
+    };
 
-    <input id="email" placeholder="Email"><br><br>
-    <input id="senha" type="password" placeholder="Senha"><br><br>
+    window.cadastrar = async () => {
+        const email = document.getElementById("email").value;
+        const senha = document.getElementById("senha").value;
 
-    <button onclick="login()">Entrar</button>
-    <button onclick="cadastrar()">Cadastrar</button>
+        const { error } = await supabase.auth.signUp({
+            email,
+            password: senha
+        });
 
-    <script type="module" src="supabase.js"></script>
-    <script>
-        async function login() {
-            const email = document.getElementById("email").value;
-            const senha = document.getElementById("senha").value;
-
-            const { error } = await supabase.auth.signInWithPassword({
-                email,
-                password: senha
-            });
-
-            if (error) alert(error.message);
-            else window.location.href = "index.html";
-        }
-
-        async function cadastrar() {
-            const email = document.getElementById("email").value;
-            const senha = document.getElementById("senha").value;
-
-            const { error } = await supabase.auth.signUp({
-                email,
-                password: senha
-            });
-
-            if (error) alert(error.message);
-            else alert("Cadastro realizado! Faça login.");
-        }
-    </script>
-
-</body>
-
-</html>
+        if (error) alert(error.message);
+        else alert("Cadastro realizado!");
+    };
+</script>
