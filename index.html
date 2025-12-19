@@ -3,32 +3,31 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="favicon.png">
-    <title>FINANÇAS</title>
-
+    <title>FINANÇAS - Home</title>
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="style.css">
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 
 <body>
     <main>
-        <h1 id="tituloMes" style="margin-bottom: 18px; color: #2C73D2; text-align: center;"></h1>
-        <div class="resume">
-            <div>
-                Entradas: R$
-                <span class="incomes">0.00</span>
-            </div>
-            <div>
-                Saídas: R$
-                <span class="expenses">0.00</span>
-            </div>
-            <div>
-                Total: R$
-                <span class="total">0.00</span>
-            </div>
+        <div style="width: 100%; display: flex; justify-content: flex-end;">
+            <button id="btnLogout"
+                style="background: #D83121; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Sair</button>
         </div>
+        <h1 id="tituloMes" style="margin-bottom: 18px; color: #2C73D2; text-align: center;"></h1>
+
+        <div class="resume">
+            <div>Entradas: R$ <span class="incomes">0.00</span></div>
+            <div>Saídas: R$ <span class="expenses">0.00</span></div>
+            <div>Total: R$ <span class="total">0.00</span></div>
+        </div>
+
         <div class="newItem">
             <div class="divDesc">
                 <label for="desc">Descrição</label>
@@ -47,6 +46,7 @@
             </div>
             <button id="btnNew">Incluir</button>
         </div>
+
         <div class="divTable">
             <table>
                 <thead>
@@ -57,32 +57,34 @@
                         <th class="columnAction"></th>
                     </tr>
                 </thead>
-                <tbody>
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
+
         <div class="acoes-finais">
-            <button id="btnFinalizarMes" style="background:#218c5b; color:#fff;">Finalizar Mês</button>
-            <button id="btnAnalisarMeses" style="background:#218c5b; color:#fff;">Analisar Meses</button>
+            <button id="btnFinalizarMes">Finalizar Mês</button>
+            <button id="btnAnalisarMeses">Analisar Meses</button>
         </div>
     </main>
 
-    <script src="back.js"></script>
     <script>
-        function nomeMesAtual() {
-            const meses = [
-                "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-                "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
-            ];
-            const hoje = new Date();
-            return meses[hoje.getMonth()] + " / " + hoje.getFullYear();
-        }
-        document.getElementById("tituloMes").textContent = nomeMesAtual();
-
-        document.getElementById("btnAnalisarMeses").onclick = function () {
-            window.location.href = "meses.html";
+        // COLE AQUI SUAS CREDENCIAIS DO FIREBASE
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_ID",
+            appId: "SEU_APP_ID"
         };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Botão Sair
+        document.getElementById("btnLogout").onclick = () => auth.signOut();
     </script>
+    <script src="back.js"></script>
 </body>
 
 </html>

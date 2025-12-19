@@ -3,162 +3,110 @@ const descItem = document.querySelector("#desc");
 const amount = document.querySelector("#amount");
 const type = document.querySelector("#type");
 const btnNew = document.querySelector("#btnNew");
-const btnFinalizarMes = document.querySelector("#btnFinalizarMes");
-const btnAnalisarMeses = document.querySelector("#btnAnalisarMeses");
 
 const incomes = document.querySelector(".incomes");
 const expenses = document.querySelector(".expenses");
 const total = document.querySelector(".total");
 
-let mesAtual = obterMesAtual();
 let items = [];
+let mesAtual = obterMesAtual();
 
-btnNew.onclick = () => {
+// 1. Monitor de Autenticação
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        document.getElementById("tituloMes").textContent = nomeMesAtualPorString(mesAtual);
+        loadItens();
+    } else {
+        window.location.href = "login.html";
+    }
+});
+
+// 2. Salvar no Firebase
+btnNew.onclick = async () => {
     if (descItem.value === "" || amount.value === "" || type.value === "") {
         return alert("Preencha todos os campos!");
     }
 
-    items.push({
+    const user = auth.currentUser;
+    await db.collection("transacoes").add({
+        userId: user.uid,
         desc: descItem.value,
         amount: Math.abs(amount.value).toFixed(2),
         type: type.value,
+        mesReferencia: mesAtual,
+        dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
     });
-
-    salvarMes(mesAtual, items);
-    loadItens();
 
     descItem.value = "";
     amount.value = "";
-};
-
-btnFinalizarMes.onclick = () => {
-    if (items.length === 0) {
-        alert("Nenhum lançamento para finalizar.");
-        return;
-    }
-    if (confirm("Finalizar mês? Os lançamentos serão salvos e o mês será reiniciado.")) {
-        mesAtual = obterProximoMesNaoExistente(mesAtual);
-        items = [];
-        salvarMes(mesAtual, items);
-        loadItens();
-        document.getElementById("tituloMes").textContent = nomeMesAtualPorString(mesAtual);
-    }
-};
-
-btnAnalisarMeses.onclick = () => {
-    window.location.href = "meses.html";
-};
-
-function deleteItem(index) {
-    items.splice(index, 1);
-    salvarMes(mesAtual, items);
     loadItens();
-}
+};
 
-function insertItem(item, index) {
-    let tr = document.createElement("tr");
+// 3. Carregar do Firebase (Apenas do usuário logado)
+async function loadItens() {
+    const user = auth.currentUser;
+    if (!user) return;
 
-    tr.innerHTML = `
-    <td>${item.desc}</td>
-    <td>R$ ${item.amount}</td>
-    <td class="columnType">${item.type === "Entrada"
-            ? '<i class="bx bxs-chevron-up-circle"></i>'
-            : '<i class="bx bxs-chevron-down-circle"></i>'
-        }</td>
-    <td class="columnAction">
-      <button onclick="deleteItem(${index})"><i class='bx bx-trash'></i></button>
-    </td>
-  `;
+    const snapshot = await db.collection("transacoes")
+        .where("userId", "==", user.uid)
+        .where("mesReferencia", "==", mesAtual)
+        .get();
 
-    tbody.appendChild(tr);
-}
+    items = [];
+    snapshot.forEach(doc => {
+        items.push({ id: doc.id, ...doc.data() });
+    });
 
-function loadItens() {
-    items = getTodosMeses()[mesAtual] || [];
     atualizarTabela();
     getTotals();
 }
 
 function atualizarTabela() {
     tbody.innerHTML = "";
-    items.forEach((item, index) => {
-        insertItem(item, index);
+    items.forEach((item) => {
+        let tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${item.desc}</td>
+            <td>R$ ${item.amount}</td>
+            <td class="columnType">${item.type === "Entrada"
+                ? '<i class="bx bxs-chevron-up-circle"></i>'
+                : '<i class="bx bxs-chevron-down-circle"></i>'}</td>
+            <td class="columnAction">
+                <button onclick="deleteItem('${item.id}')"><i class='bx bx-trash'></i></button>
+            </td>
+        `;
+        tbody.appendChild(tr);
     });
 }
 
+async function deleteItem(id) {
+    if (confirm("Excluir lançamento?")) {
+        await db.collection("transacoes").doc(id).delete();
+        loadItens();
+    }
+}
+
 function getTotals() {
-    const amountIncomes = items
-        .filter((item) => item.type === "Entrada")
-        .map((transaction) => Number(transaction.amount));
+    const totalIncomes = items
+        .filter(i => i.type === "Entrada")
+        .reduce((acc, cur) => acc + Number(cur.amount), 0).toFixed(2);
 
-    const amountExpenses = items
-        .filter((item) => item.type === "Saída")
-        .map((transaction) => Number(transaction.amount));
-
-    const totalIncomes = amountIncomes
-        .reduce((acc, cur) => acc + cur, 0)
-        .toFixed(2);
-
-    const totalExpenses = Math.abs(
-        amountExpenses.reduce((acc, cur) => acc + cur, 0)
-    ).toFixed(2);
-
-    const totalItems = (totalIncomes - totalExpenses).toFixed(2);
+    const totalExpenses = items
+        .filter(i => i.type === "Saída")
+        .reduce((acc, cur) => acc + Number(cur.amount), 0).toFixed(2);
 
     incomes.innerHTML = totalIncomes;
     expenses.innerHTML = totalExpenses;
-    total.innerHTML = totalItems;
+    total.innerHTML = (totalIncomes - totalExpenses).toFixed(2);
 }
 
-// Funções para lidar com meses
 function obterMesAtual() {
     const hoje = new Date();
     return hoje.getFullYear() + "-" + String(hoje.getMonth() + 1).padStart(2, "0");
 }
 
-function obterProximoMes(mes) {
-    let [ano, mesNum] = mes.split("-").map(Number);
-    mesNum++;
-    if (mesNum > 12) {
-        mesNum = 1;
-        ano++;
-    }
-    return ano + "-" + String(mesNum).padStart(2, "0");
-}
-
-function obterProximoMesNaoExistente(mesAtual) {
-    // Recebe o mês atual no formato "YYYY-MM"
-    let [ano, mes] = mesAtual.split("-").map(Number);
-    let mesesSalvos = getTodosMeses();
-    do {
-        mes++;
-        if (mes > 12) {
-            mes = 1;
-            ano++;
-        }
-        var proximo = ano + "-" + String(mes).padStart(2, "0");
-    } while (mesesSalvos[proximo]);
-    return proximo;
-}
-
-function getTodosMeses() {
-    return JSON.parse(localStorage.getItem("financas_meses")) ?? {};
-}
-
-function salvarMes(mes, dados) {
-    const todos = getTodosMeses();
-    todos[mes] = dados;
-    localStorage.setItem("financas_meses", JSON.stringify(todos));
-}
-
-// Função para mostrar o nome do mês a partir do formato "YYYY-MM"
 function nomeMesAtualPorString(str) {
-    const meses = [
-        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
-    ];
+    const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
     const [ano, mes] = str.split("-");
     return meses[parseInt(mes, 10) - 1] + " / " + ano;
 }
-
-loadItens();
