@@ -1,5 +1,6 @@
 import { supabase } from "./supabase.js";
 
+
 // 🔐 proteção
 const { data } = await supabase.auth.getUser();
 if (!data.user) {
