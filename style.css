@@ -235,29 +235,19 @@ i {
 }
 
 .arrow {
-    display: inline-flex;
-    width: 40px;
-    height: 20px;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
     font-weight: bold;
-    border-radius: 40px 40px 0 0;
-    padding: 0;
-    overflow: hidden;
-}
-
-.arrow i {
-    font-size: 12px;
-    line-height: 1;
+    border-radius: 20px;
+    padding: 4px 10px;
 }
 
 .arrow.up {
     background-color: #2196f3;
     color: #fff;
+    /* azul */
 }
 
 .arrow.down {
     background-color: #f44336;
     color: #fff;
+    /* vermelho */
 }
