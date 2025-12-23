@@ -186,6 +186,40 @@ i {
     transform: scale(1.2);
 }
 
+/* Botões de ação (Editar / Remover) dentro da tabela */
+.btn-edit,
+.btn-delete {
+    padding: 6px 10px;
+    margin: 0 4px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    height: 34px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    transition: background 0.15s, transform 0.08s;
+}
+
+.btn-edit {
+    background: #ffc107;
+    color: #1f2937;
+}
+
+.btn-edit:hover {
+    background: #e0a800;
+    transform: translateY(-1px);
+}
+
+.btn-delete {
+    background: #ef4444;
+    color: #fff;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
 .columnAmount {
     width: 30%;
 }

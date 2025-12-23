@@ -10,10 +10,12 @@ if (!data.user) {
 // resto do código
 let items = [];
 let mesAtual = obterMesAtual();
+let editingId = null;
 
 document.getElementById("tituloMes").innerText = mesAtual;
 
-document.getElementById("btnNew").onclick = async () => {
+const btnNew = document.getElementById("btnNew");
+btnNew.onclick = async () => {
     const desc = document.getElementById("desc").value;
     const amount = document.getElementById("amount").value;
     const type = document.getElementById("type").value;
@@ -22,16 +24,27 @@ document.getElementById("btnNew").onclick = async () => {
 
     const user = (await supabase.auth.getUser()).data.user;
 
-    await supabase.from("financas").insert({
-        user_id: user.id,
-        mes: mesAtual,
-        descricao: desc,
-        valor: Math.abs(amount),
-        tipo: type
-    });
+    if (editingId) {
+        await supabase.from("financas").update({
+            descricao: desc,
+            valor: Math.abs(amount),
+            tipo: type
+        }).eq("id", editingId);
+        editingId = null;
+        btnNew.innerText = "Adicionar";
+    } else {
+        await supabase.from("financas").insert({
+            user_id: user.id,
+            mes: mesAtual,
+            descricao: desc,
+            valor: Math.abs(amount),
+            tipo: type
+        });
+    }
 
     document.getElementById("desc").value = "";
     document.getElementById("amount").value = "";
+    document.getElementById("type").value = "Entrada";
 
     carregarMes();
 };
@@ -63,12 +76,16 @@ function render() {
                 : '<span class="arrow down">⬇</span>';
 
         tbody.innerHTML += `
-      <tr>
-        <td>${i.descricao}</td>
-        <td>R$ ${Number(i.valor).toFixed(2)}</td>
-        <td class="columnType">${tipoIcone}</td>
-      </tr>
-    `;
+            <tr>
+                <td>${i.descricao}</td>
+                <td>R$ ${Number(i.valor).toFixed(2)}</td>
+                                <td class="columnType">${tipoIcone}</td>
+                                <td>
+                                        <button class="btn-edit" data-id="${i.id}">Editar</button>
+                                        <button class="btn-delete" data-id="${i.id}">Remover</button>
+                                </td>
+            </tr>
+        `;
 
         i.tipo === "Entrada"
             ? (entradas += i.valor)
@@ -80,6 +97,39 @@ function render() {
     document.querySelector(".total").innerText = (entradas - saidas).toFixed(2);
 }
 
+// Delegation: lidar com clique e ativação por teclado em botões dentro da tabela
+tbody.querySelectorAll('.btn-edit, .btn-delete').forEach(btn => {
+    btn.setAttribute('type', 'button');
+    btn.setAttribute('tabindex', '0');
+    btn.setAttribute('aria-pressed', 'false');
+});
+
+tbody.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.btn-edit, .btn-delete');
+    if (!btn || !tbody.contains(btn)) return;
+    const id = Number(btn.dataset.id);
+    if (!id) return;
+    if (btn.classList.contains('btn-delete')) {
+        await window.deleteItem(id);
+    } else {
+        window.editItem(id);
+    }
+});
+
+tbody.addEventListener('keydown', async (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const btn = e.target.closest('.btn-edit, .btn-delete');
+    if (!btn || !tbody.contains(btn)) return;
+    e.preventDefault();
+    const id = Number(btn.dataset.id);
+    if (!id) return;
+    if (btn.classList.contains('btn-delete')) {
+        await window.deleteItem(id);
+    } else {
+        window.editItem(id);
+    }
+});
+
 
 
 function obterMesAtual() {
@@ -90,4 +140,20 @@ function obterMesAtual() {
 window.logout = async () => {
     await supabase.auth.signOut();
     window.location.href = "login.html";
+};
+
+window.deleteItem = async (id) => {
+    if (!confirm("Confirma excluir este item?")) return;
+    await supabase.from("financas").delete().eq("id", id);
+    await carregarMes();
+};
+
+window.editItem = async (id) => {
+    const item = items.find(i => i.id === id);
+    if (!item) return alert('Item não encontrado');
+    document.getElementById("desc").value = item.descricao;
+    document.getElementById("amount").value = item.valor;
+    document.getElementById("type").value = item.tipo;
+    editingId = id;
+    btnNew.innerText = "Salvar";
 };
