@@ -95,42 +95,40 @@ function render() {
     document.querySelector(".incomes").innerText = entradas.toFixed(2);
     document.querySelector(".expenses").innerText = saidas.toFixed(2);
     document.querySelector(".total").innerText = (entradas - saidas).toFixed(2);
+
+    // Delegation: lidar com clique e ativação por teclado em botões dentro da tabela
+    tbody.querySelectorAll('.btn-edit, .btn-delete').forEach(btn => {
+        btn.setAttribute('type', 'button');
+        btn.setAttribute('tabindex', '0');
+        btn.setAttribute('aria-pressed', 'false');
+    });
+
+    tbody.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.btn-edit, .btn-delete');
+        if (!btn || !tbody.contains(btn)) return;
+        const id = Number(btn.dataset.id);
+        if (!id) return;
+        if (btn.classList.contains('btn-delete')) {
+            await window.deleteItem(id);
+        } else {
+            window.editItem(id);
+        }
+    });
+
+    tbody.addEventListener('keydown', async (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const btn = e.target.closest('.btn-edit, .btn-delete');
+        if (!btn || !tbody.contains(btn)) return;
+        e.preventDefault();
+        const id = Number(btn.dataset.id);
+        if (!id) return;
+        if (btn.classList.contains('btn-delete')) {
+            await window.deleteItem(id);
+        } else {
+            window.editItem(id);
+        }
+    });
 }
-
-// Delegation: lidar com clique e ativação por teclado em botões dentro da tabela
-tbody.querySelectorAll('.btn-edit, .btn-delete').forEach(btn => {
-    btn.setAttribute('type', 'button');
-    btn.setAttribute('tabindex', '0');
-    btn.setAttribute('aria-pressed', 'false');
-});
-
-tbody.addEventListener('click', async (e) => {
-    const btn = e.target.closest('.btn-edit, .btn-delete');
-    if (!btn || !tbody.contains(btn)) return;
-    const id = Number(btn.dataset.id);
-    if (!id) return;
-    if (btn.classList.contains('btn-delete')) {
-        await window.deleteItem(id);
-    } else {
-        window.editItem(id);
-    }
-});
-
-tbody.addEventListener('keydown', async (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    const btn = e.target.closest('.btn-edit, .btn-delete');
-    if (!btn || !tbody.contains(btn)) return;
-    e.preventDefault();
-    const id = Number(btn.dataset.id);
-    if (!id) return;
-    if (btn.classList.contains('btn-delete')) {
-        await window.deleteItem(id);
-    } else {
-        window.editItem(id);
-    }
-});
-
-
 
 function obterMesAtual() {
     const d = new Date();
