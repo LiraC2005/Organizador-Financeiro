@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Login - Planner Financeiro</title>
+    <title>Cadastro - Planner Financeiro</title>
 
     <style>
         body {
@@ -42,13 +42,13 @@
             font-weight: bold;
         }
 
-        .login {
-            background: #2196f3;
+        .cadastro {
+            background: #4caf50;
             color: #fff;
         }
 
-        .cadastro {
-            background: #4caf50;
+        .voltar {
+            background: #999;
             color: #fff;
         }
 
@@ -67,17 +67,15 @@
 </head>
 
 <body>
-
     <div class="box">
-        <h2>Login</h2>
+        <h2>Criar conta</h2>
 
+        <input id="nome" placeholder="Nome completo">
         <input id="email" type="email" placeholder="Email">
         <input id="senha" type="password" placeholder="Senha">
 
-        <button class="login" onclick="login()">Entrar</button>
-        <button class="cadastro" onclick="window.location.href='cadastro.html'">
-            Criar conta
-        </button>
+        <button class="cadastro" onclick="cadastrar()">Cadastrar</button>
+        <button class="voltar" onclick="location.href='login.html'">Voltar</button>
 
         <p id="msg"></p>
     </div>
@@ -92,30 +90,36 @@
             msg.className = tipo;
         }
 
-        window.login = async () => {
-            const email = document.getElementById("email").value.trim();
-            const senha = document.getElementById("senha").value.trim();
+        window.cadastrar = async () => {
+            const nome = nome.value.trim();
+            const email = email.value.trim();
+            const senha = senha.value.trim();
 
-            const { error } = await supabase.auth.signInWithPassword({
+            if (!nome || !email || !senha) {
+                mostrar("Preencha todos os campos.", "erro");
+                return;
+            }
+
+            const { error } = await supabase.auth.signUp({
                 email,
-                password: senha
+                password: senha,
+                options: {
+                    data: {
+                        nome: nome
+                    }
+                }
             });
 
             if (error) {
-                if (error.message.includes("Email not confirmed")) {
-                    mostrar("Confirme seu email antes de entrar.", "erro");
-                } else {
-                    mostrar("Email ou senha incorretos.", "erro");
-                }
+                mostrar(error.message, "erro");
             } else {
-                mostrar("Login realizado!", "sucesso");
-                setTimeout(() => {
-                    window.location.href = "index.html";
-                }, 800);
+                mostrar(
+                    "Cadastro criado! Verifique seu email para confirmar.",
+                    "sucesso"
+                );
             }
         };
     </script>
-
 </body>
 
 </html>

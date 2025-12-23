@@ -1,11 +1,20 @@
 import { supabase } from "./supabase.js";
 
-
 // 🔐 proteção
 const { data } = await supabase.auth.getUser();
 if (!data.user) {
     window.location.href = "login.html";
 }
+
+const user = data.user;
+
+// 🔹 NOVO: buscar nome do usuário
+const nomeUsuario =
+    user.user_metadata?.nome || "Usuário";
+
+document.getElementById("usuarioNome").innerText =
+    `Olá, ${nomeUsuario} 👋`;
+
 
 // resto do código
 let items = [];
@@ -19,8 +28,6 @@ document.getElementById("btnNew").onclick = async () => {
     const type = document.getElementById("type").value;
 
     if (!desc || !amount) return alert("Preencha todos os campos");
-
-    const user = (await supabase.auth.getUser()).data.user;
 
     await supabase.from("financas").insert({
         user_id: user.id,
@@ -48,7 +55,6 @@ async function carregarMes() {
 
 await carregarMes();
 
-
 function render() {
     const tbody = document.querySelector("tbody");
     tbody.innerHTML = "";
@@ -63,12 +69,12 @@ function render() {
                 : '<span class="arrow down">⬇</span>';
 
         tbody.innerHTML += `
-      <tr>
-        <td>${i.descricao}</td>
-        <td>R$ ${Number(i.valor).toFixed(2)}</td>
-        <td class="columnType">${tipoIcone}</td>
-      </tr>
-    `;
+          <tr>
+            <td>${i.descricao}</td>
+            <td>R$ ${Number(i.valor).toFixed(2)}</td>
+            <td class="columnType">${tipoIcone}</td>
+          </tr>
+        `;
 
         i.tipo === "Entrada"
             ? (entradas += i.valor)
@@ -77,10 +83,9 @@ function render() {
 
     document.querySelector(".incomes").innerText = entradas.toFixed(2);
     document.querySelector(".expenses").innerText = saidas.toFixed(2);
-    document.querySelector(".total").innerText = (entradas - saidas).toFixed(2);
+    document.querySelector(".total").innerText =
+        (entradas - saidas).toFixed(2);
 }
-
-
 
 function obterMesAtual() {
     const d = new Date();
