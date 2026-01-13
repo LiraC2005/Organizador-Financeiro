@@ -10,10 +10,10 @@
 <body>
     <main>
 
-        <!-- 🔹 NOVO: saudação do usuário -->
+        <h1 id="tituloMes" style="margin-top: -20px;"></h1>
+        <br>
         <h2 id="usuarioNome"></h2>
 
-        <h1 id="tituloMes"></h1>
 
         <div class="resume">
             <div>Entradas R$ <span class="incomes">0.00</span></div>
@@ -29,6 +29,7 @@
                 <option>Saída</option>
             </select>
             <button id="btnNew">Adicionar</button>
+            <button id="btnCancel" style="display:none;">Cancelar</button>
         </div>
 
         <table>
@@ -37,6 +38,7 @@
                     <th>Descrição</th>
                     <th>Valor</th>
                     <th>Tipo</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody></tbody>

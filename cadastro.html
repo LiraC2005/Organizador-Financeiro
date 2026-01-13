@@ -25,7 +25,7 @@
         }
 
         input {
-            width: 100%;
+            width: 90%;
             padding: 10px;
             margin-top: 10px;
             border-radius: 4px;
@@ -91,9 +91,9 @@
         }
 
         window.cadastrar = async () => {
-            const nome = nome.value.trim();
-            const email = email.value.trim();
-            const senha = senha.value.trim();
+            const nome = document.getElementById("nome").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const senha = document.getElementById("senha").value.trim();
 
             if (!nome || !email || !senha) {
                 mostrar("Preencha todos os campos.", "erro");

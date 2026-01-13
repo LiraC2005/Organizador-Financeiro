@@ -124,6 +124,24 @@ select:focus {
     background: #1a4e8a;
 }
 
+/* Botão cancelar durante edição */
+#btnCancel {
+    background: #999;
+    color: #fff;
+    border: none;
+    padding: 0 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    height: 38px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px #e0e7ef;
+    margin-left: 6px;
+}
+
+#btnCancel:hover {
+    background: #666;
+}
+
 .divTable {
     width: 100%;
     display: flex;
@@ -250,4 +268,47 @@ i {
     background-color: #f44336;
     color: #fff;
     /* vermelho */
+}
+
+/* Estilo do botão apagar (ícone) */
+.btn-delete {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    transition: color 0.12s, transform 0.12s;
+}
+
+.btn-delete svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+}
+
+.btn-delete:hover {
+    color: #D83121;
+    transform: scale(1.08);
+}
+
+/* estilo do botão editar */
+.btn-edit {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px 4px 6px 0;
+    color: #666;
+}
+
+.btn-edit svg {
+    width: 20px;
+    height: 20px;
+}
+
+.btn-edit:hover {
+    color: #2C73D2;
+    transform: scale(1.08);
 }
