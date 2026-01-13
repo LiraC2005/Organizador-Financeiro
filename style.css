@@ -312,3 +312,113 @@ i {
     color: #2C73D2;
     transform: scale(1.08);
 }
+
+/* Responsividade: adaptações para telas pequenas */
+@media (max-width: 600px) {
+    body {
+        align-items: stretch;
+    }
+
+    main {
+        padding: 18px 14px 18px 14px;
+        margin: 0;
+        border-radius: 0;
+        min-height: 100vh;
+    }
+
+    /* visual tipo app: remover sombras e bordas arredondadas */
+    main {
+        box-shadow: none;
+    }
+
+    .resume>div {
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    table {
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    .resume {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px 0;
+        align-items: stretch;
+    }
+
+    .resume>div {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 12px;
+    }
+
+    .newItem {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .newItem>button,
+    #btnCancel {
+        width: 100%;
+    }
+
+    input,
+    select {
+        width: 100%;
+    }
+
+    .divTable {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        min-width: 560px;
+        /* permite scroll horizontal em telas muito pequenas */
+        margin-top: 8px;
+    }
+
+    th,
+    td {
+        padding: 8px 6px;
+        font-size: 0.95em;
+    }
+
+    .columnType {
+        width: 60px;
+    }
+
+    .btn-delete,
+    .btn-edit {
+        padding: 10px;
+    }
+
+    .btn-delete svg,
+    .btn-edit svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    /* Aumentar área de toque para inputs e botões */
+    input,
+    select,
+    .newItem>button {
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 400px) {
+    .resume>div {
+        font-size: 0.98em;
+        padding: 10px;
+    }
+
+    table {
+        min-width: 480px;
+    }
+}

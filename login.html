@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login - Planner Financeiro</title>
 
     <style>
@@ -63,6 +64,38 @@
         .sucesso {
             color: #4caf50;
         }
+
+        @media (max-width: 600px) {
+            body {
+                align-items: stretch;
+            }
+
+            .box {
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                min-height: 100vh;
+                padding: 28px 20px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            input {
+                width: 92%;
+                font-size: 1rem;
+                padding: 12px;
+                align-items: center;
+                justify-content: center;
+            }
+
+            button {
+                width: 100%;
+                height: 48px;
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 
@@ -70,14 +103,16 @@
 
     <div class="box">
         <h2>Login</h2>
+        <div style="display: flex; flex-direction: column; align-items: center; width: 100%; ">
 
-        <input id="email" type="email" placeholder="Email">
-        <input id="senha" type="password" placeholder="Senha">
+            <input id="email" type="email" placeholder="Email">
+            <input id="senha" type="password" placeholder="Senha">
 
-        <button class="login" onclick="login()">Entrar</button>
-        <button class="cadastro" onclick="window.location.href='cadastro.html'">
-            Criar conta
-        </button>
+            <button class="login" onclick="login()">Entrar</button>
+            <button class="cadastro" onclick="window.location.href='cadastro.html'">
+                Criar conta
+            </button>
+        </div>
 
         <p id="msg"></p>
     </div>
