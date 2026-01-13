@@ -17,7 +17,7 @@ async function init() {
 
     // buscar nome do usuário
     const nomeUsuario = user.user_metadata?.nome || "Usuário";
-    document.getElementById("usuarioNome").innerText = `Olá, ${nomeUsuario}`;
+    document.getElementById("usuarioNome").innerText = `${nomeUsuario}`;
 
     document.getElementById("tituloMes").innerText = mesAtual;
 
